@@ -141,7 +141,8 @@ const RentPage = () => {
                   )}
 
                   {/* Current page */}
-                  <span className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-700 text-white font-semibold shadow-md">
+<span className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-700 text-white font-semibold shadow-md cursor-pointer
+">
                     {currentPage}
                   </span>
 
