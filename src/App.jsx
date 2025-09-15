@@ -13,11 +13,8 @@ import {PageNotFound} from "./pages/PageNotFound";
 import { RentPage } from "./pages/RentPage";
 
 function App() {
-  const { isLoggedIn, appLoading } = useAuthContext();
+  const { isLoggedIn } = useAuthContext();
 
-  if (appLoading) {
-    return <div className="text-center mt-20">Loading...</div>;
-  }
 
   // 👉 CASE 1: NOT LOGGED IN
   if (!isLoggedIn) {
