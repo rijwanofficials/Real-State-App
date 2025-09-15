@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FiMapPin, FiSearch } from "react-icons/fi";
 import heroImage from "../assets/Hero.png";
 import { FloatingFilterBar } from "./FloatingFilterBar";
+import { ShowErrorToast } from "../utils/ToastifyHelper";
 
 function Hero() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,7 +13,7 @@ function Hero() {
     if (searchTerm.trim()) {
       navigate(`/sell`);
     } else {
-      alert("Please enter a location to search.");
+      ShowErrorToast("Please enter a location to search.");
     }
   };
 
