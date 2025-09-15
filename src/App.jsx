@@ -25,6 +25,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<BasicLayout />}>
+          <Route path="/buy" element={<BuyPage />} />
+            <Route path="/rent" element={<RentPage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/" element={<Home />} />
@@ -42,11 +45,11 @@ function App() {
         <Routes>
           <Route element={<BasicLayout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/sell" element={<Sell />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/buy" element={<BuyPage />} />
             <Route path="/rent" element={<RentPage />} />
-            <Route path="/sell" element={<Sell />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
           </Route>
           <Route path="/*" element={<PageNotFound />} />
         </Routes>

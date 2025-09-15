@@ -8,11 +8,11 @@ import {
   FaFacebookF,
   FaGoogle,
 } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom"; // ✅ use react-router-dom
+import { Link, useNavigate } from "react-router-dom";
 import loginImg from "../assets/login.png";
 import { useAuthContext } from "../context/useAuthContext";
 import { ShowErrorToast, ShowSuccessToast } from "../utils/ToastifyHelper";
-// ✅ use your reusable toast helpers
+import { LoginSignupShimmer } from "./ShimmerUi";
 
 const Login = () => {
   const { handleLogin } = useAuthContext();
@@ -32,13 +32,17 @@ const Login = () => {
     try {
       await handleLogin(formData);
       ShowSuccessToast("Login successful! 🎉");
-      navigate("/"); // ✅ Redirect to home
+      navigate("/");
     } catch (err) {
       ShowErrorToast(err.message || "Failed to login.");
     }
 
     setLoading(false);
   };
+
+  if (loading) {
+    return <LoginSignupShimmer />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -89,8 +93,7 @@ const Login = () => {
               </div>
               <div className="flex justify-between items-center mt-2">
                 <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="accent-blue-700" /> Remember
-                  Me
+                  <input type="checkbox" className="accent-blue-700" /> Remember Me
                 </label>
                 <a href="#" className="text-sm text-red-600 hover:underline">
                   Forgot Password?
