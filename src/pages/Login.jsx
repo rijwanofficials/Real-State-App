@@ -11,7 +11,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import loginImg from "../assets/login.png";
 import { useAuthContext } from "../context/useAuthContext";
-import { ShowErrorToast, ShowSuccessToast } from "../utils/ToastifyHelper";
+import { ShowErrorToast } from "../utils/ToastifyHelper";
 import { LoginSignupShimmer } from "./ShimmerUi";
 
 const Login = () => {
@@ -31,7 +31,6 @@ const Login = () => {
 
     try {
       await handleLogin(formData);
-      ShowSuccessToast("Login successful! 🎉");
       navigate("/");
     } catch (err) {
       ShowErrorToast(err.message || "Failed to login.");

@@ -27,12 +27,11 @@ const AppContextProvider = ({ children }) => {
   const [type, setType] = useState("House");
   const [location, setLocation] = useState("Indonesia");
 
-// PropertyContext
-
 const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
-    const fetchProperties = async () => 
+
+const fetchProperties = async () => 
       {
       try {
         setLoading(true);
@@ -47,40 +46,62 @@ const [properties, setProperties] = useState([]);
       }
     };
 
+const handleSignup = async (formData) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      formData.email,
+      formData.password
+    );
+
+    const idToken = await userCredential.user.getIdToken();
+
+    // Call backend to create user record
+    await fetch("http://localhost:3700/api/v1/users", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${idToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    ShowSuccessToast("Signup successful! Please login.");
+    return { userCredential, idToken };
+  } catch (error) {
+    ShowErrorToast(error.message);
+    throw error;
+  }
+};
 
 
-  // Auth Functions
-  const handleSignup = async (formData) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-      ShowSuccessToast("Signup successful! Please login.");
-      return userCredential;
-    } catch (error) {
-      ShowErrorToast(error.message);
-      throw error;
-    }
-  };
+const handleLogin = async (formData) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      formData.email,
+      formData.password
+    );
+    const idToken = await userCredential.user.getIdToken();
 
-  const handleLogin = async (formData) => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-      ShowSuccessToast("Login successful!");
-      return userCredential;
-    } catch (error) {
-      ShowErrorToast(error.message);
-      throw error;
-    }
-  };
+    // Call backend to ensure user exists in DB
+    await fetch("http://localhost:3700/api/v1/users", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${idToken}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-  const handleLogout = async () => {
+    ShowSuccessToast("Login successful!");
+    return { userCredential, idToken };
+  } catch (error) {
+    ShowErrorToast(error.message);
+    throw error;
+  }
+};
+
+
+const handleLogout = async () => {
     try {
       await signOut(auth);
       ShowSuccessToast("Logged out successfully!");
@@ -89,7 +110,27 @@ const [properties, setProperties] = useState([]);
     }
   };
 
-  // Track auth login state
+const getUserData = async (idToken) => {
+  try {
+    const response = await fetch('http://localhost:3700/api/v1/users/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${idToken}`,  // Send token here
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch user data');
+    }
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    ShowErrorToast(error.message);
+  }
+};
+
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
@@ -107,6 +148,7 @@ const [properties, setProperties] = useState([]);
     handleSignup,
     handleLogin,
     handleLogout,
+    getUserData,
   };
 
   const filterValues = {
