@@ -8,7 +8,7 @@ function Hero() {
   const navigate = useNavigate();
 
   const handleFind = () => {
-      navigate(`/property`);  
+      navigate("/sell", { state: { searchTerm } });  
   };
 
   return (
