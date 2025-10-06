@@ -3,18 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { FiMapPin, FiSearch } from "react-icons/fi";
 import heroImage from "../assets/Hero.png";
 import { FloatingFilterBar } from "./FloatingFilterBar";
-import { ShowErrorToast } from "../utils/ToastifyHelper";
-
 function Hero() {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   const handleFind = () => {
-    if (searchTerm.trim()) {
-      navigate(`/sell`);
-    } else {
-      ShowErrorToast("Please enter a location to search.");
-    }
+      navigate(`/property`);  
   };
 
   return (
@@ -51,7 +45,7 @@ function Hero() {
 
               <button
                 onClick={handleFind}
-                className="w-full md:w-52 h-12 flex items-center justify-center bg-white text-blue-600 border border-blue-600 rounded-3xl font-medium transition hover:bg-blue-600 hover:text-white"
+                className="w-full md:w-52 h-12 flex items-center justify-center bg-white text-blue-600 border border-blue-600 rounded-3xl font-medium transition hover:bg-blue-600 hover:text-white hover:cursor-pointer"
               >
                 List Your Property
               </button>

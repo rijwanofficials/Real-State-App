@@ -11,6 +11,7 @@ import { BasicLayout } from "./components/BasicLayout";
 import { useAuthContext } from "./context/useAuthContext";
 import {PageNotFound} from "./pages/PageNotFound";
 import { RentPage } from "./pages/RentPage";
+import { PropertyListing } from "./pages/PropertyListing";
 
 function App() {
   const { isLoggedIn } = useAuthContext();
@@ -47,6 +48,7 @@ function App() {
             <Route path="/buy" element={<BuyPage />} />
             <Route path="/rent" element={<RentPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/property" element={<PropertyListing />} />
           </Route>
           <Route path="/*" element={<PageNotFound />} />
         </Routes>
