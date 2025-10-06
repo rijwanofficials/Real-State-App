@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuthContext } from "../context/useAuthContext";
+import { ShowErrorToast, ShowSuccessToast } from "../utils/ToastifyHelper";
 
 const Sell = () => {
   const { user } = useAuthContext();
@@ -12,22 +13,19 @@ const Sell = () => {
     images: "",
   });
   const [loading, setLoading] = useState(false);
-
   const handleChange = (e) => {
     setProperty({ ...property, [e.target.name]: e.target.value });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      alert("You must be logged in to create a property!");
+      ShowErrorToast("You must be logged in to list a property!");
       return;
     }
-
     try {
       setLoading(true);
       const token = await user.getIdToken();
-      const response = await fetch("http://localhost:3700/api/v1/properties", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/properties`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,7 +39,7 @@ const Sell = () => {
 
       const data = await response.json();
       if (data.isSuccess) {
-        alert("Property created successfully!");
+        ShowSuccessToast("Property created successfully!");
         setProperty({
           title: "",
           description: "",
@@ -51,11 +49,11 @@ const Sell = () => {
           images: "",
         });
       } else {
-        alert("Error: " + data.message);
+        ShowErrorToast("Error: " + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert(err.message);
+      ShowErrorToast(err.message);
     } finally {
       setLoading(false);
     }

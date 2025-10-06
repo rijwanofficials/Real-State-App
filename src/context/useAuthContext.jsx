@@ -57,7 +57,7 @@ const AppContextProvider = ({ children }) => {
       const idToken = await userCredential.user.getIdToken();
 
       // Call backend to create user record
-      await fetch("http://localhost:3700/api/v1/users", {
+      await fetch(`${import.meta.env.VITE_BACKEND_URL}/users`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${idToken}`,
@@ -86,7 +86,7 @@ const AppContextProvider = ({ children }) => {
       console.log("User credential in Login", userCredential, idToken);
 
       // Call backend to ensure user exists in DB
-      await fetch("http://localhost:3700/api/v1/users", {
+      await fetch(`${import.meta.env.VITE_BACKEND_URL}/users`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${idToken}`,
@@ -113,7 +113,7 @@ const AppContextProvider = ({ children }) => {
 
   const getUserData = async (idToken) => {
     try {
-      const response = await fetch("http://localhost:3700/api/v1/users/me", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${idToken}`, // Send token here
