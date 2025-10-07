@@ -36,10 +36,17 @@ const AppContextProvider = ({ children }) => {
       const res = await fetch(
         "https://68b826bcb715405043274639.mockapi.io/api/properties/PropertyListing"
       );
-      if (!res.ok) throw new Error("Failed to fetch properties");
+      if (!res.ok) {
+        ShowErrorToast("Failed to fetch properties");
+        return;
+      }
       const data = await res.json();
-      setProperties(data);
-    } catch (err) {
+      if (data && data.length > 0) {
+        ShowSuccessToast("Properties fetched successfully");
+        setProperties(data);
+      }
+      }
+     catch (err) {
       ShowErrorToast(err.message);
     } finally {
       setLoading(false);
@@ -64,8 +71,6 @@ const AppContextProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
       });
-
-      ShowSuccessToast("Signup successful! Please login.");
       return { userCredential, idToken };
     } catch (error) {
       ShowErrorToast(error.message);
