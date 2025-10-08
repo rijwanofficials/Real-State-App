@@ -1,4 +1,4 @@
-import heroImage from "../assets/RentPage.jpg"; // Adjust image as needed
+import heroImage from "../assets/RentPage.jpg";
 import { FloatingFilterBar } from "../components/FloatingFilterBar";
 import { usePropetyContext } from "../context/useAuthContext";
 import { useState } from "react";

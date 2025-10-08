@@ -1,4 +1,26 @@
- const ContactPage = () => {
+import { useAuthContext } from "../context/useAuthContext";
+
+const ContactPage = () => {
+  const { sendContactForm } = useAuthContext();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      name: e.target.name.value,
+      email: e.target.email.value,
+      message: e.target.message.value,
+    };
+
+    try {
+      await sendContactForm(formData);
+      // Optional: clear form after success
+      e.target.reset();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
+
   return (
     <section className="max-w-[1280px] mx-auto px-6 py-16 md:py-24">
       <h2 className="text-4xl md:text-5xl font-bold text-[#1E3A8A] mb-6">
@@ -8,7 +30,10 @@
         Have questions or need assistance? We’re here to help! Reach out to us through the form below or via our contact details.
       </p>
 
-      <form className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+      <form
+        onSubmit={handleSubmit} 
+        className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8"
+      >
         <div className="mb-6">
           <label htmlFor="name" className="block mb-2 font-semibold text-gray-800">
             Name
@@ -16,6 +41,7 @@
           <input
             type="text"
             id="name"
+            name="name" 
             placeholder="Your full name"
             className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]"
             required
@@ -29,6 +55,7 @@
           <input
             type="email"
             id="email"
+            name="email"
             placeholder="Your email address"
             className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]"
             required
@@ -41,6 +68,7 @@
           </label>
           <textarea
             id="message"
+            name="message" 
             placeholder="Write your message here"
             rows="5"
             className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]"
@@ -58,4 +86,5 @@
     </section>
   );
 };
-export {ContactPage}
+
+export { ContactPage };

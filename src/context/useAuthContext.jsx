@@ -42,7 +42,6 @@ const AppContextProvider = ({ children }) => {
       }
       const data = await res.json();
       if (data && data.length > 0) {
-        ShowSuccessToast("Properties fetched successfully");
         setProperties(data);
       }
       }
@@ -98,7 +97,6 @@ const AppContextProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
       });
-
       ShowSuccessToast("Login successful!");
       return { userCredential, idToken };
     } catch (error) {
@@ -136,6 +134,38 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
+  const sendContactForm = async (formData) => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      ShowErrorToast("You must be logged in to submit the contact form.");
+      return;
+    }
+
+    const idToken = await currentUser.getIdToken();
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/contacts`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+     ShowErrorToast("Error: " + (errorData.message || "Failed to submit form"));
+      return;
+    }
+
+    ShowSuccessToast("Message sent to admin successfully!");
+    return await response.json();
+  } catch (error) {
+    ShowErrorToast(error.message);
+    throw error;
+  }
+};
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
@@ -154,6 +184,7 @@ const AppContextProvider = ({ children }) => {
     handleLogin,
     handleLogout,
     getUserData,
+    sendContactForm
   };
 
   const filterValues = {
