@@ -30,6 +30,19 @@ const AppContextProvider = ({ children }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const checkAdmin = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return false;
+
+      const tokenResult = await currentUser.getIdTokenResult(true); // refresh token
+      return tokenResult.claims.admin || false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
   const fetchProperties = async () => {
     try {
       setLoading(true);
@@ -44,8 +57,7 @@ const AppContextProvider = ({ children }) => {
       if (data && data.length > 0) {
         setProperties(data);
       }
-      }
-     catch (err) {
+    } catch (err) {
       ShowErrorToast(err.message);
     } finally {
       setLoading(false);
@@ -116,13 +128,16 @@ const AppContextProvider = ({ children }) => {
 
   const getUserData = async (idToken) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/me`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${idToken}`, // Send token here
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/users/me`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${idToken}`, // Send token here
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
@@ -135,36 +150,41 @@ const AppContextProvider = ({ children }) => {
   };
 
   const sendContactForm = async (formData) => {
-  try {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      ShowErrorToast("You must be logged in to submit the contact form.");
-      return;
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        ShowErrorToast("You must be logged in to submit the contact form.");
+        return;
+      }
+
+      const idToken = await currentUser.getIdToken();
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/contacts`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        ShowErrorToast(
+          "Error: " + (errorData.message || "Failed to submit form")
+        );
+        return;
+      }
+
+      ShowSuccessToast("Message sent to admin successfully!");
+      return await response.json();
+    } catch (error) {
+      ShowErrorToast(error.message);
+      throw error;
     }
-
-    const idToken = await currentUser.getIdToken();
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/contacts`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${idToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-     ShowErrorToast("Error: " + (errorData.message || "Failed to submit form"));
-      return;
-    }
-
-    ShowSuccessToast("Message sent to admin successfully!");
-    return await response.json();
-  } catch (error) {
-    ShowErrorToast(error.message);
-    throw error;
-  }
-};
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -184,7 +204,8 @@ const AppContextProvider = ({ children }) => {
     handleLogin,
     handleLogout,
     getUserData,
-    sendContactForm
+    sendContactForm,
+    checkAdmin
   };
 
   const filterValues = {

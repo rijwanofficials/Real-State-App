@@ -6,16 +6,12 @@ import { HeroShimmer, ShimmerCard, PaginationShimmer } from "../pages/ShimmerUi"
 
 function BuyPage() {
   const handleFind = () => {
-    console.log("Find button clicked");
   };
 
   const { properties, loading } = usePropetyContext();
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4; // adjust as you want
+  const itemsPerPage = 4;
 
-  // Calculate indexes
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedProperties = properties.slice(startIndex, startIndex + itemsPerPage);
 

@@ -1,9 +1,12 @@
-import { useState } from "react";
 import { useAuthContext } from "../context/useAuthContext";
+import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { ShowErrorToast, ShowSuccessToast } from "../utils/ToastifyHelper";
 
-const Sell = () => {
-  const { user } = useAuthContext();
+const SellPage = () => {
+  const { isLoggedIn, checkAdmin, user } = useAuthContext();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [property, setProperty] = useState({
     title: "",
     description: "",
@@ -12,10 +15,23 @@ const Sell = () => {
     type: "House",
     images: "",
   });
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const verifyAdmin = async () => {
+      if (isLoggedIn) {
+        const adminStatus = await checkAdmin();
+        setIsAdmin(adminStatus);
+      }
+      setLoading(false);
+    };
+    verifyAdmin();
+  }, [isLoggedIn, checkAdmin]);
+
   const handleChange = (e) => {
     setProperty({ ...property, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -23,7 +39,7 @@ const Sell = () => {
       return;
     }
     try {
-      setLoading(true);
+      setSubmitting(true);
       const token = await user.getIdToken();
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/properties`, {
         method: "POST",
@@ -36,7 +52,6 @@ const Sell = () => {
           images: property.images.split(",").map((img) => img.trim()),
         }),
       });
-
       const data = await response.json();
       if (data.isSuccess) {
         ShowSuccessToast("Property created successfully!");
@@ -52,15 +67,18 @@ const Sell = () => {
         ShowErrorToast("Error: " + data.message);
       }
     } catch (err) {
-      console.error(err);
       ShowErrorToast(err.message);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
+  if (loading) return <div className="flex justify-center items-center h-screen"><p>Loading...</p></div>;
+  if (!isLoggedIn) return <Navigate to="/login" />;
+  if (!isAdmin) return <p className=" text-red-500 m-4 text-center font-bold">Access Denied. Only admins can <span className="underline">sell properties.</span> </p>;
+
   return (
-    <>
+    <div>
       <div className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white py-10 px-6 text-center shadow-md">
         <h1 className="text-4xl font-extrabold mb-2">Sell Your Property</h1>
         <p className="text-lg opacity-90">
@@ -136,19 +154,17 @@ const Sell = () => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={submitting}
             className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 shadow-md ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+              submitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}
           >
-            {loading ? "Creating..." : "Create Property"}
+            {submitting ? "Creating..." : "Create Property"}
           </button>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 
-export { Sell };
+export { SellPage };
